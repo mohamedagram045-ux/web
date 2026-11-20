@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>POSTORA | Make Your Walls Speak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1a1c1a;
+    --ink-2: #444748;
+    --muted: #747878;
+    --line: #c4c7c7;
+    --paper: #faf9f6;
+    --paper-2: #f4f3f1;
+    --paper-3: #efeeeb;
+    --chip: #e9e8e5;
+    --rust: #a04100;
+    --rust-dark: #351000;
+    --peach: #ffdbcc;
+    --white: #ffffff;
+    --radius-pill: 9999px;
+    --radius-card: 12px;
+    --shadow: 0 1px 1px rgba(0,0,0,0.05), 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    --font-head: 'Syne', system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--paper); color: var(--ink); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+  body { padding-bottom: 84px; }
+  a { color: inherit; text-decoration: none; }
+  button, input { font-family: inherit; }
+  img { max-width: 100%; display: block; }
+
+  /* Placeholder art: swap for exported Figma images (see note in reply) */
+  .art { width: 100%; height: 100%; position: relative; overflow: hidden; }
+  .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.35) 100%); }
+  .art-1 { background: linear-gradient(135deg, #351000 0%, #a04100 55%, #ffdbcc 100%); }
+  .art-2 { background: linear-gradient(135deg, #1a1c1a 0%, #444748 50%, #c4c7c7 100%); }
+  .art-3 { background: linear-gradient(135deg, #747878 0%, #e9e8e5 60%, #faf9f6 100%); }
+  .art-4 { background: linear-gradient(135deg, #a04100 0%, #ffdbcc 45%, #efeeeb 100%); }
+  .art-5 { background: linear-gradient(135deg, #444748 0%, #747878 50%, #e9e8e5 100%); }
+  .art-6 { background: linear-gradient(135deg, #351000 0%, #1a1c1a 70%); }
+
+  .container { width: 100%; max-width: 390px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Top announcement bar ---------- */
+  .announce { background: var(--ink); color: var(--white); font-size: 11px; letter-spacing: 1.1px; text-transform: uppercase; text-align: center; padding: 5px 12px; font-weight: 600; }
+
+  /* ---------- Header ---------- */
+  .header { background: var(--paper); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--chip); }
+  .header-row { display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .header-left { display: flex; align-items: center; gap: 8px; }
+  .icon-btn { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; position: relative; color: var(--ink); }
+  .icon-btn svg { width: 20px; height: 20px; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-mark { width: 32px; height: 32px; border-radius: 8px; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 700; font-size: 14px; }
+  .brand-text { font-family: var(--font-head); font-weight: 700; font-size: 18px; letter-spacing: 1px; line-height: 1; }
+  .brand-text small { display: block; font-family: var(--font-body); font-size: 9px; letter-spacing: 1.5px; color: var(--muted); font-weight: 600; margin-top: 3px; }
+  .header-right { display: flex; align-items: center; }
+  .badge { position: absolute; top: 8px; right: 6px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--rust); color: var(--white); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+  .desktop-nav { display: none; }
+  .mobile-only { display: block; }
+
+  /* ---------- Sticky search + pills ---------- */
+  .sub-header { background: var(--paper); padding: 10px 0 12px; position: sticky; top: 52px; z-index: 40; }
+  .search-row { display: flex; gap: 8px; align-items: center; }
+  .search-box { flex: 1; height: 44px; background: var(--white); border-radius: var(--radius-pill); box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; padding: 0 16px; }
+  .search-box svg { width: 14px; height: 14px; color: var(--muted); flex-shrink: 0; }
+  .search-box input { border: 0; outline: 0; background: transparent; font-size: 13px; width: 100%; color: var(--ink); }
+  .search-box input::placeholder { color: var(--muted); }
+  .filter-btn { height: 44px; padding: 0 14px; border-radius: var(--radius-pill); background: var(--white); border: 0; box-shadow: var(--shadow); display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--ink); white-space: nowrap; }
+  .filter-btn svg { width: 14px; height: 14px; }
+  .pills { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0 2px; scrollbar-width: none; }
+  .pills::-webkit-scrollbar { display: none; }
+  .pill { flex: 0 0 auto; padding: 7px 16px; border-radius: var(--radius-pill); background: var(--white); box-shadow: 0 1px 1px rgba(0,0,0,0.05); font-size: 12px; font-weight: 600; border: 0; cursor: pointer; color: var(--ink); white-space: nowrap; }
+  .pill.active { background: var(--ink); color: var(--white); }
+
+  /* ---------- Section shared ---------- */
+  section { padding: 28px 0; }
+  .eyebrow { font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--rust); font-weight: 700; }
+  .h2 { font-family: var(--font-head); font-size: 30px; line-height: 1.05; font-weight: 700; letter-spacing: -0.5px; margin-top: 8px; text-transform: uppercase; }
+  .lead { font-size: 13px; color: var(--ink-2); line-height: 1.55; margin-top: 10px; }
+  .section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 18px; }
+  .link-arrow { font-size: 12px; font-weight: 700; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 12px; border: 0; font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; cursor: pointer; transition: transform .15s ease, opacity .15s ease; }
+  .btn:hover { opacity: .9; transform: translateY(-1px); }
+  .btn-dark { background: var(--ink); color: var(--white); box-shadow: var(--shadow); }
+  .btn-light { background: var(--white); color: var(--ink); box-shadow: var(--shadow); }
+  .btn-rust { background: var(--rust); color: var(--white); box-shadow: var(--shadow); }
+  .btn-full { width: 100%; }
+
+  /* ---------- Hero ---------- */
+  .hero-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--peach); color: var(--rust-dark); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 10px; border-radius: var(--radius-pill); }
+  .hero-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--rust); }
+  .hero h1 { font-family: var(--font-head); font-size: 52px; line-height: .95; font-weight: 700; letter-spacing: -1.5px; margin-top: 14px; text-transform: uppercase; }
+  .hero h1 span { color: var(--rust); }
+  .hero p { font-size: 14px; color: var(--ink-2); line-height: 1.6; margin-top: 16px; }
+  .cta-row { display: flex; gap: 10px; margin-top: 22px; }
+  .cta-row .btn { flex: 1; }
+  .hero-visual { position: relative; margin-top: 26px; height: 320px; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+  .hotspot { position: absolute; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.88); backdrop-filter: blur(8px); border-radius: var(--radius-pill); padding: 6px 10px 6px 8px; font-size: 11px; font-weight: 600; box-shadow: var(--shadow); }
+  .hotspot .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rust); box-shadow: 0 0 0 4px rgba(160,65,0,0.2); }
+  .hotspot .price { color: var(--rust); font-weight: 700; }
+  .hotspot.h1 { left: 7px; top: 68px; }
+  .hotspot.h2 { right: 16px; top: 107px; }
+  .micro-banner { position: absolute; left: 12px; right: 12px; bottom: 12px; background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .micro-banner strong { display: block; font-size: 12px; font-weight: 700; }
+  .micro-banner span { font-size: 11px; color: var(--muted); }
+  .micro-banner a { font-size: 11px; font-weight: 700; color: var(--rust); white-space: nowrap; }
+
+  /* ---------- Collections ---------- */
+  .collection { background: var(--white); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 18px; }
+  .collection-img { position: relative; height: 200px; }
+  .collection-img .tag { position: absolute; top: 12px; left: 12px; z-index: 2; background: rgba(255,255,255,0.9); color: var(--ink); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 5px 10px; border-radius: var(--radius-pill); }
+  .collection-body { padding: 16px; }
+  .collection-body h3 { font-family: var(--font-head); font-size: 20px; text-transform: uppercase; letter-spacing: -0.2px; }
+  .collection-body p { font-size: 12.5px; color: var(--ink-2); margin-top: 6px; line-height: 1.5; }
+  .collection-body .btn { margin-top: 14px; width: 100%; }
+
+  /* ---------- Product grid ---------- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .product { background: var(--white); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .product-img { position: relative; height: 180px; margin: 8px; border-radius: 10px; overflow: hidden; }
+  .ribbon { position: absolute; top: 8px; left: 8px; z-index: 2; background: var(--white); font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: var(--radius-pill); box-shadow: var(--shadow); }
+  .ribbon.rust { background: var(--rust); color: var(--white); }
+  .wish { position: absolute; top: 8px; right: 8px; z-index: 2; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .wish svg { width: 14px; height: 14px; }
+  .wish.on svg path { fill: var(--rust); stroke: var(--rust); }
+  .product-body { padding: 8px 12px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .product-cat { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+  .product-name { font-family: var(--font-head); font-size: 15px; font-weight: 700; line-height: 1.2; }
+  .price-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 6px; }
+  .price { font-size: 15px; font-weight: 700; }
+  .price s { font-size: 11px; color: var(--muted); font-weight: 500; margin-left: 4px; }
+  .add-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: var(--white); border: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .add-btn svg { width: 12px; height: 12px; }
+  .spec { font-size: 10px; color: var(--muted); }
+
+  /* ---------- Shop by style ---------- */
+  .style-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .style-tile { position: relative; height: 112px; border-radius: 14px; overflow: hidden; display: block; }
+  .style-tile .label { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; color: var(--white); }
+  .style-tile .label strong { display: block; font-family: var(--font-head); font-size: 14px; letter-spacing: .3px; text-transform: uppercase; }
+  .style-tile .label span { font-size: 11px; opacity: .9; }
+
+  /* ---------- Promo ---------- */
+  .promo { background: var(--ink); color: var(--white); border-radius: 20px; padding: 26px 22px; position: relative; overflow: hidden; }
+  .promo::before { content: ""; position: absolute; width: 200px; height: 200px; right: -60px; bottom: -60px; border-radius: 50%; background: radial-gradient(circle, rgba(160,65,0,0.9), rgba(160,65,0,0)); }
+  .promo-tags { display: flex; gap: 8px; flex-wrap: wrap; position: relative; }
+  .promo-tag { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 6px 10px; border-radius: var(--radius-pill); background: var(--rust); }
+  .promo-tag.ghost { background: rgba(255,255,255,0.12); }
+  .promo h2 { font-family: var(--font-head); font-size: 34px; line-height: 1; margin-top: 18px; text-transform: uppercase; position: relative; }
+  .promo p { font-size: 13px; line-height: 1.6; margin-top: 12px; color: #e9e8e5; position: relative; }
+  .promo p strong { color: var(--peach); }
+  .code-box { margin-top: 18px; background: rgba(255,255,255,0.08); border: 1px dashed rgba(255,255,255,0.3); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+  .code-box small { font-size: 10px; letter-spacing: 1.5px; color: #c4c7c7; text-transform: uppercase; font-weight: 600; }
+  .code-box strong { font-family: var(--font-head); font-size: 18px; letter-spacing: 2px; }
+  .promo .btn { margin-top: 18px; width: 100%; background: var(--white); color: var(--ink); position: relative; }
+
+  /* ---------- New arrivals ---------- */
+  .weekly { display: inline-flex; flex-direction: column; align-items: flex-end; background: var(--peach); color: var(--rust-dark); padding: 8px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; line-height: 1.2; text-align: center; }
+  .weekly b { font-family: var(--font-head); font-size: 16px; letter-spacing: 0; }
+
+  /* ---------- Room showcase ---------- */
+  .room-scroller { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 4px 20px 8px; scrollbar-width: none; }
+  .room-scroller::-webkit-scrollbar { display: none; }
+  .room-card { flex: 0 0 256px; scroll-snap-align: start; background: var(--white); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+  .room-img { position: relative; height: 160px; }
+  .room-img .tag { position: absolute; top: 10px; left: 10px; z-index: 2; background: rgba(255,255,255,0.92); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 5px 10px; border-radius: var(--radius-pill); }
+  .room-body { padding: 14px; }
+  .room-body h3 { font-family: var(--font-head); font-size: 17px; text-transform: uppercase; }
+  .room-body p { font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+  .room-body a { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--rust); }
+
+  /* ---------- Trust ---------- */
+  .trust-wrap { background: var(--paper-2); border-radius: 20px; padding: 26px 20px; }
+  .trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+  .trust-card { background: var(--white); border-radius: 14px; padding: 16px 14px; box-shadow: var(--shadow); }
+  .trust-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--peach); color: var(--rust-dark); display: flex; align-items: center; justify-content: center; }
+  .trust-icon svg { width: 18px; height: 18px; }
+  .trust-card h4 { font-family: var(--font-head); font-size: 13px; letter-spacing: .5px; margin-top: 14px; text-transform: uppercase; }
+  .trust-card p { font-size: 11.5px; color: var(--ink-2); line-height: 1.5; margin-top: 6px; }
+
+  /* ---------- Reviews ---------- */
+  .review-scroller { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 4px 20px 10px; scrollbar-width: none; }
+  .review-scroller::-webkit-scrollbar { display: none; }
+  .review { flex: 0 0 300px; scroll-snap-align: start; background: var(--white); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); }
+  .review-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .reviewer { display: flex; gap: 10px; align-items: center; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .reviewer strong { display: block; font-size: 13px; }
+  .reviewer span { font-size: 11px; color: var(--muted); }
+  .stars { display: flex; gap: 2px; }
+  .stars svg { width: 13px; height: 13px; fill: var(--rust); }
+  .review q { display: block; font-size: 13px; line-height: 1.6; margin-top: 14px; color: var(--ink-2); quotes: none; }
+  .purchased { display: inline-block; margin-top: 14px; background: var(--paper-3); font-size: 10.5px; font-weight: 600; padding: 6px 10px; border-radius: var(--radius-pill); color: var(--ink-2); }
+
+  /* ---------- Newsletter / Free audit ---------- */
+  .newsletter { background: var(--white); border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: var(--shadow); }
+  .news-icon { width: 48px; height: 48px; border-radius: 14px; background: var(--ink); color: var(--white); display: inline-flex; align-items: center; justify-content: center; }
+  .news-icon svg { width: 20px; height: 20px; }
+  .newsletter h2 { font-family: var(--font-head); font-size: 26px; text-transform: uppercase; line-height: 1.05; margin-top: 16px; }
+  .newsletter > p { font-size: 13px; color: var(--ink-2); line-height: 1.55; margin: 12px auto 0; max-width: 300px; }
+  .form { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+  .field { display: flex; align-items: center; gap: 10px; background: var(--paper); border-radius: var(--radius-pill); box-shadow: 0 1px 1px rgba(0,0,0,0.05); padding: 0 16px; height: 48px; }
+  .field svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
+  .field input { flex: 1; border: 0; background: transparent; outline: 0; font-size: 13px; color: var(--ink); min-width: 0; }
+  .field input::placeholder { color: var(--muted); }
+  .form .btn { width: 100%; margin-top: 4px; }
+  .form-msg { min-height: 20px; font-size: 12.5px; text-align: center; margin-top: 4px; font-weight: 600; }
+  .form-msg.ok { color: #2f6b2f; }
+  .form-msg.err { color: var(--rust); }
+  .audit-box { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--chip); }
+  .audit-box p { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .audit-box .btn { width: 100%; }
+
+  /* ---------- Footer ---------- */
+  footer { background: var(--ink); color: var(--paper); padding: 34px 0 30px; margin-top: 28px; }
+  footer .brand-text { color: var(--paper); }
+  footer .brand-mark { background: var(--paper); color: var(--ink); }
+  footer .brand-text small { color: #c4c7c7; }
+  .footer-about { font-size: 12.5px; line-height: 1.6; color: #c4c7c7; margin-top: 14px; }
+  .socials { display: flex; gap: 10px; margin-top: 18px; }
+  .socials a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
+  .socials svg { width: 16px; height: 16px; fill: none; stroke: var(--paper); stroke-width: 1.6; }
+  .acc { border-top: 1px solid rgba(255,255,255,0.12); margin-top: 22px; }
+  .acc details { border-bottom: 1px solid rgba(255,255,255,0.12); }
+  .acc summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 16px 0; font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+  .acc summary::-webkit-details-marker { display: none; }
+  .acc summary::after { content: "+"; font-size: 16px; font-weight: 400; }
+  .acc details[open] summary::after { content: "–"; }
+  .acc ul { list-style: none; padding: 0 0 16px; display: grid; gap: 10px; font-size: 12.5px; color: #c4c7c7; }
+  .pay-title { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #c4c7c7; font-weight: 700; margin-top: 26px; text-align: center; }
+  .pay-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+  .pay-chip { background: var(--white); color: var(--ink); font-size: 10.5px; font-weight: 700; padding: 6px 10px; border-radius: 8px; }
+  .copy { margin-top: 26px; font-size: 11px; color: #c4c7c7; text-align: center; line-height: 1.6; }
+  .copy small { display: block; margin-top: 4px; opacity: .8; }
+
+  /* ---------- Bottom nav ---------- */
+  .bottom-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: rgba(250,249,246,0.96); backdrop-filter: blur(12px); border-top: 1px solid var(--chip); display: flex; justify-content: space-around; padding: 8px 6px 10px; }
+  .bottom-nav a { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; color: var(--muted); min-width: 56px; padding: 4px 0; }
+  .bottom-nav a.active { color: var(--ink); }
+  .bottom-nav svg { width: 18px; height: 18px; }
+  .bottom-nav .dot { position: absolute; top: 2px; right: 14px; width: 8px; height: 8px; border-radius: 50%; background: var(--rust); }
+
+  /* ---------- Responsive: tablet & desktop ---------- */
+  @media (min-width: 640px) {
+    .container { max-width: 720px; padding: 0 28px; }
+    .h2 { font-size: 40px; }
+    .hero h1 { font-size: 72px; }
+    .hero-visual { height: 420px; }
+    .hotspot.h1 { left: 20px; top: 110px; }
+    .hotspot.h2 { right: 24px; top: 180px; }
+    .grid-2 { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .collection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .collection { margin-bottom: 0; }
+    .style-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .style-tile { height: 140px; }
+    .room-scroller, .review-scroller { margin: 0; padding: 4px 0 10px; flex-wrap: wrap; overflow: visible; }
+    .room-card { flex: 1 1 calc(50% - 8px); }
+    .review { flex: 1 1 calc(50% - 8px); }
+    .trust-grid { grid-template-columns: repeat(4, 1fr); }
+    .newsletter { padding: 40px 36px; }
+    .form { flex-direction: row; flex-wrap: wrap; }
+    .form .field { flex: 1 1 calc(33% - 10px); }
+    .form .btn { flex: 1 1 100%; }
+  }
+
+  @media (min-width: 1024px) {
+    body { padding-bottom: 0; }
+    .container { max-width: 1140px; padding: 0 40px; }
+    .announce { font-size: 12px; padding: 7px 12px; }
+    .header-row { height: 68px; }
+    .mobile-only { display: none; }
+    .desktop-nav { display: flex; gap: 22px; font-size: 13px; font-weight: 600; }
+    .desktop-nav a:hover { color: var(--rust); }
+    .sub-header { top: 68px; }
+    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    .hero h1 { font-size: 96px; }
+    .hero-visual { margin-top: 0; height: 560px; }
+    .hotspot.h1 { left: 36px; top: 150px; }
+    .hotspot.h2 { right: 36px; top: 250px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .product-img { height: 220px; }
+    .collection-grid { grid-template-columns: repeat(3, 1fr); }
+    .room-card { flex: 1 1 calc(25% - 12px); }
+    .style-grid { grid-template-columns: repeat(6, 1fr); }
+    .promo-wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; }
+    .promo h2 { font-size: 52px; }
+    .newsletter-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
+    .review { flex: 1 1 calc(50% - 8px); }
+    .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 40px; }
+    .acc { margin-top: 0; border-top: 0; }
+    .acc summary { padding: 0 0 12px; }
+    .acc details { border-bottom: 0; }
+    .acc details ul { padding-bottom: 12px; }
+    .pay-title { text-align: left; }
+    .pay-row { justify-content: flex-start; }
+    .copy { text-align: left; }
+    .product-body { padding: 8px 14px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ TOP ANNOUNCEMENT ============ -->
+<div class="announce">Free shipping on orders above ₹999 | Use code: POSTORA10</div>
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="container header-row">
+    <div class="header-left">
+      <button class="icon-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h18M3 12h18M3 17h12"/></svg>
+      </button>
+      <a href="#" class="brand">
+        <span class="brand-mark">P</span>
+        <span class="brand-text">POSTORA<small>EST. 2024</small></span>
+      </a>
+    </div>
+    <nav class="desktop-nav" aria-label="Main">
+      <a href="#">Home</a>
+      <a href="#collections">Posters</a>
+      <a href="#collections">Stickers</a>
+      <a href="#collections">Wall Decor</a>
+      <a href="#rooms">Shop by Room</a>
+      <a href="#new">New Arrivals</a>
+      <a href="#best">Best Sellers</a>
+      <a href="#promo">Offers</a>
+    </nav>
+    <div class="header-right">
+      <button class="icon-btn" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </button>
+      <button class="icon-btn" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+        <span class="badge">0</span>
+      </button>
+      <button class="icon-btn" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span class="badge">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ SUB-HEADER: SEARCH + PILLS ============ -->
+<div class="sub-header">
+  <div class="container">
+    <div class="search-row">
+      <label class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input type="text" placeholder="Search posters, stickers, wall decor..." />
+      </label>
+      <button class="filter-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        Filter
+      </button>
+    </div>
+    <div class="pills" role="tablist">
+      <button class="pill active">All</button>
+      <button class="pill">🔥 Posters</button>
+      <button class="pill">✨ Stickers</button>
+      <button class="pill">🖼️ Wall Decor</button>
+      <button class="pill">🛋️ By Room</button>
+      <button class="pill">⭐ Best Sellers</button>
+      <button class="pill">🏷️ Offers</button>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ 2. HERO ============ -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="hero-tag">Art that feels like you.</span>
+        <h1>Walls <span>speak.</span></h1>
+        <p>Discover art that reflects your personality. Explore premium posters, creative stickers and tactile wall decor crafted to elevate modern living.</p>
+        <div class="cta-row">
+          <a href="#collections" class="btn btn-dark">Explore Collection</a>
+          <a href="#best" class="btn btn-light">Best Sellers</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="art art-1"></div>
+        <div class="hotspot h1"><span class="dot"></span>Matisse Cutout <span class="price">₹499</span></div>
+        <div class="hotspot h2"><span class="dot"></span>Totoro Framed <span class="price">₹899</span></div>
+        <div class="micro-banner">
+          <div>
+            <strong>Gallery Edition Paper</strong>
+            <span>Archival 300 GSM matte stock</span>
+          </div>
+          <a href="#best">View Spec →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. FEATURED COLLECTIONS ============ -->
+  <section id="collections">
+    <div class="container">
+      <div>
+        <span class="eyebrow">Curated Catalog</span>
+        <h2 class="h2">Explore our<br>collections</h2>
+        <p class="lead">Find the perfect style for every corner of your space.</p>
+      </div>
+      <div class="collection-grid" style="margin-top:22px">
+        <article class="collection">
+          <div class="collection-img">
+            <div class="art art-2"></div>
+            <span class="tag">Over 2,400+ Prints</span>
+          </div>
+          <div class="collection-body">
+            <h3>Posters</h3>
+            <p>Express your personality through timeless wall art.</p>
+            <a href="#best" class="btn btn-dark">Shop Posters</a>
+          </div>
+        </article>
+        <article class="collection">
+          <div class="collection-img">
+            <div class="art art-4"></div>
+          </div>
+          <div class="collection-body">
+            <h3>Stickers</h3>
+            <p>Small details. Big personality on laptops, journals &amp; phones.</p>
+            <a href="#best" class="btn btn-dark">Shop Stickers</a>
+          </div>
+        </article>
+        <article class="collection">
+          <div class="collection-img">
+            <div class="art art-5"></div>
+            <span class="tag">Crafted Frames</span>
+          </div>
+          <div class="collection-body">
+            <h3>Wall Decor</h3>
+            <p>Transform bare rooms into curated private sanctuaries.</p>
+            <a href="#best" class="btn btn-dark">Shop Wall Decor</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. BEST SELLERS ============ -->
+  <section id="best">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Top Picks</span>
+          <h2 class="h2">The Crowd<br>Favourites</h2>
+        </div>
+        <a href="#best" class="link-arrow">See all</a>
+      </div>
+      <div class="grid-2 grid-4">
+        <article class="product">
+          <div class="product-img">
+            <div class="art art-1"></div>
+            <span class="ribbon rust">30% OFF</span>
+            <button class="wish" aria-label="Add to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+          </div>
+          <div class="product-body">
+            <span class="product-cat">Posters • A3 Size</span>
+            <h3 class="product-name">Retro Tokyo Cyberpunk</h3>
+            <div class="price-row">
+              <span class="price">₹599<s>₹899</s></span>
+              <button class="add-btn" aria-label="Add to bag"><svg viewBox="0 0 12 12" stroke="currentColor" stroke-width="2"><path d="M6 1v10M1 6h10"/></svg></button>
+            </div>
+          </div>
+        </article>
+        <article class="product">
+          <div class="product-img">
+            <div class="art art-3"></div>
+            <span class="ribbon">Bestseller</span>
+            <button class="wish" aria-label="Add to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+          </div>
+          <div class="product-body">
+            <span class="product-cat">Music • Framed Print</span>
+            <h3 class="product-name">Vintage Fleetwood Print</h3>
+            <div class="price-row">
+              <span class="price">₹749<s>₹1,099</s></span>
+              <button class="add-btn" aria-label="Add to bag"><svg viewBox="0 0 12 12" stroke="currentColor" stroke-width="2"><path d="M6 1v10M1 6h10"/></svg></button>
+            </div>
+          </div>
+        </article>
+        <article class="product">
+          <div class="product-img">
+            <div class="art art-2"></div>
+            <span class="ribbon rust">25% OFF</span>
+            <button class="wish" aria-label="Add to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+          </div>
+          <div class="product-body">
+            <span class="product-cat">Minimalist • Wall Art</span>
+            <h3 class="product-name">Bauhaus Geometric No. 4</h3>
+            <div class="price-row">
+              <span class="price">₹499<s>₹699</s></span>
+              <button class="add-btn" aria-label="Add to bag"><svg viewBox="0 0 12 12" stroke="currentColor" stroke-width="2"><path d="M6 1v10M1 6h10"/></svg></button>
+            </div>
+          </div>
+        </article>
+        <article class="product">
+          <div class="product-img">
+            <div class="art art-4"></div>
+            <span class="ribbon">Set of 25</span>
+            <button class="wish" aria-label="Add to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+          </div>
+          <div class="product-body">
+            <span class="product-cat">Stickers • Vinyl Pack</span>
+            <h3 class="product-name">90s Anime Sticker Pack</h3>
+            <div class="price-row">
+              <span class="price">₹349<s>₹499</s></span>
+              <button class="add-btn" aria-label="Add to bag"><svg viewBox="0 0 12 12" stroke="currentColor" stroke-width="2"><path d="M6 1v10M1 6h10"/></svg></button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. SHOP BY STYLE ============ -->
+  <section>
+    <div class="container">
+      <span class="eyebrow">Genre Exploration</span>
+      <h2 class="h2">Find your<br>aesthetic</h2>
+      <p class="lead">Tap into styles that resonate with your inner mood.</p>
+      <div class="style-grid" style="margin-top:20px">
+        <a href="#collections" class="style-tile"><div class="art art-1"></div><div class="label"><strong>Anime &amp; Manga</strong><span>Explore →</span></div></a>
+        <a href="#collections" class="style-tile"><div class="art art-2"></div><div class="label"><strong>Minimalist</strong><span>Explore →</span></div></a>
+        <a href="#collections" class="style-tile"><div class="art art-3"></div><div class="label"><strong>Vintage &amp; Retro</strong><span>Explore →</span></div></a>
+        <a href="#collections" class="style-tile"><div class="art art-4"></div><div class="label"><strong>Music &amp; Movies</strong><span>Explore →</span></div></a>
+        <a href="#collections" class="style-tile"><div class="art art-6"></div><div class="label"><strong>Gaming</strong><span>Explore →</span></div></a>
+        <a href="#collections" class="style-tile"><div class="art art-5"></div><div class="label"><strong>Nature &amp; Travel</strong><span>Explore →</span></div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6. PROMO BANNER ============ -->
+  <section id="promo" style="padding-top:8px">
+    <div class="container">
+      <div class="promo promo-wrap">
+        <div>
+          <div class="promo-tags">
+            <span class="promo-tag">Limited Time Offer</span>
+            <span class="promo-tag ghost">Expires in 48 Hours</span>
+          </div>
+          <h2>Your walls deserve better.</h2>
+          <p>Build your own aesthetic with our curated poster collections. <strong>Buy 2 Get 1 Free</strong> on all premium A3 framed prints this week only.</p>
+        </div>
+        <div>
+          <div class="code-box">
+            <div>
+              <small>Promo code</small><br>
+              <strong>WALLMAGIC3</strong>
+            </div>
+          </div>
+          <a href="#best" class="btn">Explore Posters</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7. NEW ARRIVALS ============ -->
+  <section id="new">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Just Dropped</span>
+          <h2 class="h2">Fresh off<br>the press</h2>
+        </div>
+        <div class="weekly">Weekly<b>Drop</b></div>
+      </div>
+      <div class="grid-2">
+        <article class="product">
+          <div class="product-img">
+            <div class="art art-5"></div>
+            <span class="ribbon rust">New</span>
+            <button class="wish" aria-label="Add to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+          </div>
+          <div class="product-body">
+            <span class="product-cat">Kitchen &amp; Dining</span>
+            <h3 class="product-name">Matcha Club Print</h3>
+            <div class="price-row"><span class="spec">Framed canvas</span></div>
+          </div>
+        </article>
+        <article class="product">
+          <div class="product-img">
+            <div class="art art-6"></div>
+            <span class="ribbon rust">New</span>
+            <button class="wish" aria-label="Add to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+          </div>
+          <div class="product-body">
+            <span class="product-cat">Framed Canvas</span>
+            <h3 class="product-name">Neo Kanagawa Wave</h3>
+            <div class="price-row"><span class="spec">Gallery finish</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8. SHOP BY ROOM ============ -->
+  <section id="rooms">
+    <div class="container">
+      <span class="eyebrow">Spatial Harmony</span>
+      <h2 class="h2">Design your space</h2>
+      <p class="lead">Curated pairings tailored to elevate specific rooms.</p>
+    </div>
+    <div class="container">
+      <div class="room-scroller" style="margin-top:20px">
+        <article class="room-card">
+          <div class="room-img"><div class="art art-3"></div><span class="tag">Sanctuary</span></div>
+          <div class="room-body">
+            <h3>Bedroom</h3>
+            <p>Calm palettes &amp; restful tones</p>
+            <a href="#rooms">Shop Bedroom Sets →</a>
+          </div>
+        </article>
+        <article class="room-card">
+          <div class="room-img"><div class="art art-6"></div><span class="tag">RGB Energy</span></div>
+          <div class="room-body">
+            <h3>Gaming Room</h3>
+            <p>High-voltage neon &amp; mecha prints</p>
+            <a href="#rooms">Shop Gaming Sets →</a>
+          </div>
+        </article>
+        <article class="room-card">
+          <div class="room-img"><div class="art art-4"></div><span class="tag">Focus</span></div>
+          <div class="room-body">
+            <h3>Study &amp; Office</h3>
+            <p>Productivity &amp; minimal botanicals</p>
+            <a href="#rooms">Shop Workspace Sets →</a>
+          </div>
+        </article>
+        <article class="room-card">
+          <div class="room-img"><div class="art art-2"></div><span class="tag">Statement</span></div>
+          <div class="room-body">
+            <h3>Living Room</h3>
+            <p>Large gallery-scale focal frames</p>
+            <a href="#rooms">Shop Living Art →</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9. TRUST MATRIX ============ -->
+  <section>
+    <div class="container">
+      <div class="trust-wrap">
+        <span class="eyebrow">The POSTORA Difference</span>
+        <h2 class="h2">Crafted for<br>your walls</h2>
+        <div class="trust-grid">
+          <div class="trust-card">
+            <div class="trust-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6l7-3z"/></svg></div>
+            <h4>Premium Quality</h4>
+            <p>Archival 300 GSM matte paper &amp; waterproof durable vinyl.</p>
+          </div>
+          <div class="trust-card">
+            <div class="trust-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.6 5.6L21 9.5l-4.5 4.4 1 6.1L12 17l-5.5 3 1-6.1L3 9.5l6.4-.9L12 3z"/></svg></div>
+            <h4>Unique Designs</h4>
+            <p>Hand-curated artwork that matches your singular taste.</p>
+          </div>
+          <div class="trust-card">
+            <div class="trust-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg></div>
+            <h4>Safe Checkout</h4>
+            <p>Encrypted UPI, Cards, NetBanking, EMI &amp; COD available.</p>
+          </div>
+          <div class="trust-card">
+            <div class="trust-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.5"/><circle cx="17" cy="17.5" r="1.5"/></svg></div>
+            <h4>Delivery to Door</h4>
+            <p>Damage-free rigid protective tubes &amp; reinforced corner boxes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10. REVIEWS ============ -->
+  <section>
+    <div class="container">
+      <span class="eyebrow">Verified Testimonials</span>
+      <h2 class="h2">Loved by art lovers</h2>
+      <p class="lead">Over 15,000+ rooms decorated across India.</p>
+      <div class="review-scroller" style="margin-top:20px">
+        <article class="review">
+          <div class="review-head">
+            <div class="reviewer">
+              <span class="avatar">AR</span>
+              <div><strong>Aarav Sharma</strong><span>Bengaluru • Verified Buyer</span></div>
+            </div>
+            <div class="stars">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+            </div>
+          </div>
+          <q>The print resolution is immaculate! I ordered the Japanese Woodblock Wave in A2 framed and the matte finish doesn't glare at all under desk lamps. Packaging was extremely sturdy.</q>
+          <span class="purchased">Purchased: Japanese Wave A2 Framed</span>
+        </article>
+        <article class="review">
+          <div class="review-head">
+            <div class="reviewer">
+              <span class="avatar">NM</span>
+              <div><strong>Nisha Menon</strong><span>Mumbai • Verified Buyer</span></div>
+            </div>
+            <div class="stars">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>
+            </div>
+          </div>
+          <q>Stickers survived 4 coffee spills and daily laptop friction without peeling! The colors are punchy and feel like real boutique merchandise. Buying again!</q>
+          <span class="purchased">Purchased: 90s Anime Sticker Pack (Set of 25)</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 11. NEWSLETTER + FREE AUDIT ============ -->
+  <section id="signup" style="padding-top:8px">
+    <div class="container newsletter-wrap">
+      <div class="newsletter">
+        <div class="news-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        </div>
+        <h2>Get inspired. Stay creative.</h2>
+        <p>Subscribe to unlock new curated drops, secret collector promos and creative inspiration.</p>
+
+        <form class="form" id="signupForm" novalidate>
+          <label class="field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            <input type="text" id="name" name="name" placeholder="Your name" autocomplete="name" required />
+          </label>
+          <label class="field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <input type="email" id="email" name="email" placeholder="Enter your email address" autocomplete="email" required />
+          </label>
+          <label class="field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+            <input type="tel" id="phone" name="phone" placeholder="Phone number" autocomplete="tel" required />
+          </label>
+          <button type="submit" class="btn btn-dark" id="submitBtn">Subscribe</button>
+          <div class="form-msg" id="formMsg" role="status" aria-live="polite"></div>
+        </form>
+
+        <div class="audit-box">
+          <p>Want a personalised wall audit before you buy?</p>
+          <a class="btn btn-rust" href="https://payments.cashfree.com/forms/getaudit" target="_blank" rel="noopener">Free Audit</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ 12. FOOTER ============ -->
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <a href="#" class="brand">
+        <span class="brand-mark">P</span>
+        <span class="brand-text">POSTORA<small>EST. 2024</small></span>
+      </a>
+      <p class="footer-about">Make Your Walls Speak. Contemporary wall art prints, gallery wood frames, and tactile lifestyle decor created for modern living spaces.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg></a>
+        <a href="#" aria-label="Pinterest"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-3.3 17.4c-.1-.7-.1-1.9 0-2.7l1.1-4.7s-.3-.6-.3-1.5c0-1.4.8-2.5 1.8-2.5.9 0 1.3.6 1.3 1.4 0 .9-.5 2.2-.8 3.4-.2 1 .5 1.9 1.5 1.9 1.8 0 3.1-1.9 3.1-4.6 0-2.4-1.7-4.1-4.2-4.1-2.9 0-4.6 2.2-4.6 4.4 0 .9.3 1.8.8 2.3l.1.1-.3 1.2c0 .2-.2.2-.4.1-1.3-.6-2.1-2.5-2.1-4 0-3.3 2.4-6.3 6.9-6.3 3.6 0 6.4 2.6 6.4 6 0 3.6-2.2 6.4-5.4 6.4-1 0-2-.5-2.4-1.2l-.6 2.4c-.2.9-.8 2-1.2 2.7A9 9 0 1 0 12 3z"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8z"/></svg></a>
+      </div>
+    </div>
+    <div class="acc">
+      <details open>
+        <summary>Shop Categories</summary>
+        <ul>
+          <li>Posters</li>
+          <li>Stickers</li>
+          <li>Wall Decor</li>
+          <li>Shop by Room</li>
+          <li>New Arrivals</li>
+          <li>Best Sellers</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Customer Service</summary>
+        <ul>
+          <li>Track order</li>
+          <li>Shipping &amp; returns</li>
+          <li>FAQs</li>
+          <li>Contact us</li>
+        </ul>
+      </details>
+      <details>
+        <summary>About POSTORA</summary>
+        <ul>
+          <li>Our story</li>
+          <li>Privacy policy</li>
+          <li>Terms of service</li>
+        </ul>
+      </details>
+    </div>
+    <div>
+      <p class="pay-title">100% Secure Checkout</p>
+      <div class="pay-row">
+        <span class="pay-chip">UPI (GPay / PhonePe)</span>
+        <span class="pay-chip">RuPay</span>
+        <span class="pay-chip">VISA</span>
+        <span class="pay-chip">Mastercard</span>
+        <span class="pay-chip">NetBanking</span>
+      </div>
+      <div class="copy">
+        Copyright © 2026 POSTORA Inc. All Rights Reserved.
+        <small>Handcrafted with pride in India</small>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ BOTTOM NAV (mobile) ============ -->
+<nav class="bottom-nav mobile-only" aria-label="Bottom navigation">
+  <a href="#" class="active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/></svg>
+    Home
+  </a>
+  <a href="#collections">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    Categories
+  </a>
+  <a href="#best">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+    Wishlist
+    <span class="dot"></span>
+  </a>
+  <a href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+    Cart
+  </a>
+  <a href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+    Profile
+  </a>
+</nav>
+
+<script>
+  // ===== Google Apps Script endpoint (deployed web app, /exec) =====
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMGeufOhhaZeBqOruPqB6oWOfrO1_arVjUJ4ZImbLIEympKB-HqzRepmx6auUE3dmrHQ/exec";
+
+  const form = document.getElementById("signupForm");
+  const btn = document.getElementById("submitBtn");
+  const msg = document.getElementById("formMsg");
+
+  function showSuccess() {
+    msg.className = "form-msg ok";
+    msg.textContent = "Thanks! You're on the list.";
+    form.reset();
+    btn.disabled = false;
+    btn.textContent = "Subscribe";
+  }
+
+  function showError() {
+    msg.className = "form-msg err";
+    msg.textContent = "Something went wrong. Please try again.";
+    btn.disabled = false;
+    btn.textContent = "Subscribe";
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+
+    if (!name || !email || !phone) {
+      msg.className = "form-msg err";
+      msg.textContent = "Please fill in name, email and phone.";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+    msg.textContent = "";
+
+    const url = SCRIPT_URL + "?" + new URLSearchParams({ name: name, email: email, phone: phone });
+
+    fetch(url, { method: "GET", mode: "no-cors" })
+      .then(() => showSuccess())
+      .catch(() => showError());
+  });
+
+  // Pills: single active state
+  document.querySelectorAll(".pill").forEach(function (pill) {
+    pill.addEventListener("click", function () {
+      document.querySelectorAll(".pill").forEach(function (p) { p.classList.remove("active"); });
+      pill.classList.add("active");
+    });
+  });
+
+  // Wishlist hearts
+  document.querySelectorAll(".wish").forEach(function (w) {
+    w.addEventListener("click", function () { w.classList.toggle("on"); });
+  });
+</script>
+</body>
+</html>
